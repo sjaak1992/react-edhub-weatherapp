@@ -14,11 +14,12 @@ const apiKey ='3ddb15ebe6322101df105688857e4cfd'
 function App() {
 
   const [weatherData, setWeatherData] = useState(null);
+  const [location, setLocation] = useState('');
 
   async function fetchData (){
     try {
       const result = await
-          axios.get(`https://api.openweathermap.org/data/2.5/weather?q=utrecht,nl&appid=${apiKey}&lang=nl`);
+          axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${location},nl&appid=${apiKey}&lang=nl`);
       setWeatherData(result.data);
       console.log(result.data)
     } catch (e){
@@ -32,7 +33,7 @@ function App() {
 
         {/*HEADER -------------------- */}
         <div className="weather-header">
-          <SearchBar/>
+          <SearchBar setLocationHandler={setLocation}/>
 
           <span className="location-details">
 
