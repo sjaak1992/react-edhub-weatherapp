@@ -1,75 +1,95 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import SearchBar from './components/searchBar/SearchBar';
 import TabBarMenu from './components/tabBarMenu/TabBarMenu';
 import MetricSlider from './components/metricSlider/MetricSlider';
 import './App.css';
 import axios from 'axios';
+import ForecastTab from "./pages/forecastTab/ForecastTab";
 
 
-
-const apiKey ='3ddb15ebe6322101df105688857e4cfd'
-
+export const apiKey = "3ddb15ebe6322101df105688857e4cfd";
 
 
 function App() {
 
-  const [weatherData, setWeatherData] = useState(null);
-  const [location, setLocation] = useState('');
+    const [weatherData, setWeatherData] = useState(null);
+    const [location, setLocation] = useState('');
+    const [error, setError] = useState(false);
+    const [loading, toggleLoading] = useState('');
 
-  async function fetchData (){
-    try {
-      const result = await
-          axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${location},nl&appid=${apiKey}&lang=nl`);
-      setWeatherData(result.data);
-      console.log(result.data)
-    } catch (e){
-      console.error(e);
-    }
-  }
 
-  return (
-    <>
-      <div className="weather-container">
+    useEffect(() => {
+        async function fetchData() {
+            setError('');
+            toggleLoading(true);
 
-        {/*HEADER -------------------- */}
-        <div className="weather-header">
-          <SearchBar setLocationHandler={setLocation}/>
+            try {
 
-          <span className="location-details">
+                const result = await
+                    axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${location},nl&appid=${apiKey}&lang=nl`);
+                setWeatherData(result.data);
+                console.log(result.data)
 
-            {weatherData &&
-                <>
-            <h2>{weatherData.weather[0].description}</h2>
-            <h3>{weatherData.name} </h3>
-            <h1>{weatherData.main.temp}</h1>
-                </>
+            } catch (e) {
+                setError('Whoops, something went wrong!');
+                console.error(e);
             }
+            toggleLoading(false);
+
+        }
+
+        if (location) {
+            fetchData();
+        }
+    }, [location]);
+
+    return (
+        <>
+            <div className="weather-container">
+
+                {/*HEADER -------------------- */}
+                <div className="weather-header">
+                    <SearchBar setLocationHandler={setLocation}/>
+
+                    {/*// set location = dit is callback prop, een functie die de waarde terug geeft, we geven hier props door
+                     passing props down(name: setLocationHandle, value:setLocation) je kan de state veranderen in de app.
+                    */}
 
 
-            <button
-                type="button"
-                onClick={fetchData}
-            >
-              Haal data op!
-            </button>
-</span>
+                    <span className="location-details">
+            {weatherData &&
+            <>
+                <h2>{weatherData.weather[0].description}</h2>
+                <h3>{weatherData.name} </h3>
+                <h1>{weatherData.main.temp}</h1>
+            </>
+            }       </span>
 
 
-        </div>
+                    {/*            <button*/}
+                    {/*                type="button"*/}
+                    {/*                onClick={fetchData}*/}
+                    {/*            >*/}
+                    {/*  Haal data op!*/}
+                    {/*</button>*/}
 
-        {/*CONTENT ------------------ */}
-        <div className="weather-content">
-          <TabBarMenu/>
 
-          <div className="tab-wrapper">
-            Alle inhoud van de tabbladen komt hier!
-          </div>
-        </div>
+                </div>
 
-        <MetricSlider/>
-      </div>
-    </>
-  );
+                {/*CONTENT ------------------ */}
+                <div className="weather-content">
+                    <TabBarMenu/>
+
+                    <div className="tab-wrapper">
+                        <ForecastTab coordinates={weatherData && weatherData.coord}/>
+                        {/*// props doorgeven*/}
+                    </div>
+                </div>
+
+                <MetricSlider/>
+            </div>
+        </>
+    );
 }
 
 export default App;

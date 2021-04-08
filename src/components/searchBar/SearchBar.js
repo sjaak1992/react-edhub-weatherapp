@@ -4,6 +4,10 @@ import './SearchBar.css';
 
 
 function SearchBar({setLocationHandler}) {
+//Props meegeven als parameter, deze zitten in callback functie app. props. nu zijn ze gedestructered
+    // function SearchBar (props)
+    // console.log(props) om te kijken of deze goed zijn doorgegeven
+
     const [query, setQuery] = useState('');
 
     function handleClick (){
